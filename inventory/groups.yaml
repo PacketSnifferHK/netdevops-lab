@@ -1,0 +1,12 @@
+---
+eos:
+  platform: eos
+  connection_options:
+    napalm:
+      platform: eos
+      extras:
+        optional_args:
+          # cEOS exposes the eAPI over HTTPS with a self-signed cert.
+          transport: https
+    netmiko:
+      platform: arista_eos

@@ -1,0 +1,52 @@
+# Containerlab topology — a small campus network.
+#
+#            core1 ======(OSPF)====== core2
+#            /  \                      /  \
+#           /    \                    /    \
+#        acc1 ---+--------------------+--- acc2
+#        (VLAN 10 / 20 access, trunked up to both cores)
+#
+# core1/core2 : Layer 3. OSPF area 0 between them, SVIs act as the
+#               gateways for VLAN 10 and 20, with VRRP for redundancy.
+# acc1/acc2   : Layer 2. VLAN 10 (USERS) and VLAN 20 (SERVERS),
+#               dual-homed trunk uplinks to both cores.
+#
+# Run:  sudo containerlab deploy -t clab/campus.clab.yml
+# Inspect (see mgmt IPs):  sudo containerlab inspect -t clab/campus.clab.yml
+
+name: campus
+
+mgmt:
+  network: campus_mgmt
+  ipv4-subnet: 172.20.20.0/24
+
+topology:
+  kinds:
+    arista_ceos:
+      # Set this to the cEOS image tag you imported (see README step 2).
+      image: ceos:4.32.0F
+
+  nodes:
+    core1:
+      kind: arista_ceos
+      mgmt-ipv4: 172.20.20.11
+      startup-config: configs/core1.cfg
+    core2:
+      kind: arista_ceos
+      mgmt-ipv4: 172.20.20.12
+      startup-config: configs/core2.cfg
+    acc1:
+      kind: arista_ceos
+      mgmt-ipv4: 172.20.20.21
+      startup-config: configs/acc1.cfg
+    acc2:
+      kind: arista_ceos
+      mgmt-ipv4: 172.20.20.22
+      startup-config: configs/acc2.cfg
+
+  links:
+    - endpoints: ["core1:eth1", "core2:eth1"]   # L3 OSPF link between cores
+    - endpoints: ["acc1:eth1", "core1:eth2"]    # acc1 trunk -> core1
+    - endpoints: ["acc1:eth2", "core2:eth2"]    # acc1 trunk -> core2
+    - endpoints: ["acc2:eth1", "core1:eth3"]    # acc2 trunk -> core1
+    - endpoints: ["acc2:eth2", "core2:eth3"]    # acc2 trunk -> core2

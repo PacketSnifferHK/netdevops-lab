@@ -1,0 +1,5 @@
+---
+# Lab credentials. These match the bootstrap configs in clab/configs/.
+# In the real world these come from env vars / a vault — never commit real ones.
+username: admin
+password: admin

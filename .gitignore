@@ -1,0 +1,23 @@
+# Generated / runtime
+rendered/
+backups/
+clab-campus/
+.clab/
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# Secrets
+.env
+*.env
+!.env.example
+
+# Editor / OS
+.vscode/
+.idea/
+.DS_Store

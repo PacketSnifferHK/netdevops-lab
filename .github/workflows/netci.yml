@@ -1,0 +1,54 @@
+name: netci
+
+# Network CI: on every push, prove the config still renders cleanly from the
+# source of truth. This catches broken templates or bad inventory data before
+# they ever reach a device.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  render-and-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Render device configs from inventory
+        run: python render_configs.py
+
+      - name: Show the generated configs
+        run: |
+          for f in rendered/*.cfg; do
+            echo "===== $f ====="
+            cat "$f"
+          done
+
+      - name: Upload rendered configs
+        uses: actions/upload-artifact@v4
+        with:
+          name: rendered-configs
+          path: rendered/
+
+  # Full live validation (deploy to the lab + run pytest) needs the Arista
+  # cEOS image, which isn't publicly pullable. Run it on a self-hosted runner
+  # that has Docker + Containerlab + the cEOS image imported:
+  #
+  # validate-lab:
+  #   runs-on: [self-hosted, clab]
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - run: sudo containerlab deploy -t clab/campus.clab.yml
+  #     - run: pip install -r requirements.txt
+  #     - run: python render_configs.py && python deploy.py
+  #     - run: pytest -v
+  #     - run: sudo containerlab destroy -t clab/campus.clab.yml
+  #       if: always()

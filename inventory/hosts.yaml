@@ -1,0 +1,81 @@
+---
+# The "source of truth" for the network. Edit THIS, not the devices.
+# The pipeline renders these values into real config and pushes them.
+
+core1:
+  hostname: 172.20.20.11
+  groups: [eos]
+  data:
+    role: core
+    router_id: 1.1.1.1
+    loopback: 1.1.1.1
+    vlans:
+      10: USERS
+      20: SERVERS
+    l3_links:
+      - { name: Ethernet1, ip: 10.255.0.0, mask: 31, desc: "OSPF link to core2", ospf: true }
+    svis:
+      # core1 is the VRRP master (higher priority)
+      - { vlan: 10, ip: 10.0.10.2, mask: 24, vrrp: 10, vip: 10.0.10.1, priority: 110 }
+      - { vlan: 20, ip: 10.0.20.2, mask: 24, vrrp: 20, vip: 10.0.20.1, priority: 110 }
+    trunks:
+      - { name: Ethernet2, desc: "trunk to acc1", allowed: "10,20" }
+      - { name: Ethernet3, desc: "trunk to acc2", allowed: "10,20" }
+    ospf:
+      process: 1
+      networks:
+        - { prefix: 1.1.1.1,    wildcard: 0.0.0.0,   area: 0 }
+        - { prefix: 10.255.0.0, wildcard: 0.0.0.1,   area: 0 }
+        - { prefix: 10.0.10.0,  wildcard: 0.0.0.255, area: 0 }
+        - { prefix: 10.0.20.0,  wildcard: 0.0.0.255, area: 0 }
+
+core2:
+  hostname: 172.20.20.12
+  groups: [eos]
+  data:
+    role: core
+    router_id: 2.2.2.2
+    loopback: 2.2.2.2
+    vlans:
+      10: USERS
+      20: SERVERS
+    l3_links:
+      - { name: Ethernet1, ip: 10.255.0.1, mask: 31, desc: "OSPF link to core1", ospf: true }
+    svis:
+      # core2 is the VRRP backup (lower priority)
+      - { vlan: 10, ip: 10.0.10.3, mask: 24, vrrp: 10, vip: 10.0.10.1, priority: 100 }
+      - { vlan: 20, ip: 10.0.20.3, mask: 24, vrrp: 20, vip: 10.0.20.1, priority: 100 }
+    trunks:
+      - { name: Ethernet2, desc: "trunk to acc1", allowed: "10,20" }
+      - { name: Ethernet3, desc: "trunk to acc2", allowed: "10,20" }
+    ospf:
+      process: 1
+      networks:
+        - { prefix: 2.2.2.2,    wildcard: 0.0.0.0,   area: 0 }
+        - { prefix: 10.255.0.0, wildcard: 0.0.0.1,   area: 0 }
+        - { prefix: 10.0.10.0,  wildcard: 0.0.0.255, area: 0 }
+        - { prefix: 10.0.20.0,  wildcard: 0.0.0.255, area: 0 }
+
+acc1:
+  hostname: 172.20.20.21
+  groups: [eos]
+  data:
+    role: access
+    vlans:
+      10: USERS
+      20: SERVERS
+    trunks:
+      - { name: Ethernet1, desc: "uplink to core1", allowed: "10,20" }
+      - { name: Ethernet2, desc: "uplink to core2", allowed: "10,20" }
+
+acc2:
+  hostname: 172.20.20.22
+  groups: [eos]
+  data:
+    role: access
+    vlans:
+      10: USERS
+      20: SERVERS
+    trunks:
+      - { name: Ethernet1, desc: "uplink to core1", allowed: "10,20" }
+      - { name: Ethernet2, desc: "uplink to core2", allowed: "10,20" }

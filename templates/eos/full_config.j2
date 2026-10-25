@@ -1,0 +1,54 @@
+!
+! ===== Service config for {{ host_name }} ({{ d.role }}) =====
+! Generated from inventory — do not edit on the device, edit inventory/hosts.yaml
+!
+{% if d.role == 'core' %}
+ip routing
+!
+{% endif %}
+{% for vid, vname in d.vlans.items() %}
+vlan {{ vid }}
+   name {{ vname }}
+{% endfor %}
+!
+{% for t in d.get('trunks', []) %}
+interface {{ t.name }}
+   description {{ t.desc }}
+   switchport mode trunk
+   switchport trunk allowed vlan {{ t.allowed }}
+   no shutdown
+!
+{% endfor %}
+{% for l in d.get('l3_links', []) %}
+interface {{ l.name }}
+   description {{ l.desc }}
+   no switchport
+   ip address {{ l.ip }}/{{ l.mask }}
+   no shutdown
+!
+{% endfor %}
+{% if d.role == 'core' %}
+interface Loopback0
+   ip address {{ d.loopback }}/32
+!
+{% for s in d.svis %}
+interface Vlan{{ s.vlan }}
+   description Gateway for VLAN {{ s.vlan }}
+   ip address {{ s.ip }}/{{ s.mask }}
+   vrrp {{ s.vrrp }} ipv4 {{ s.vip }}
+   vrrp {{ s.vrrp }} priority-level {{ s.priority }}
+   no shutdown
+!
+{% endfor %}
+router ospf {{ d.ospf.process }}
+   router-id {{ d.router_id }}
+   passive-interface default
+{% for l in d.l3_links if l.ospf %}
+   no passive-interface {{ l.name }}
+{% endfor %}
+{% for n in d.ospf.networks %}
+   network {{ n.prefix }} {{ n.wildcard }} area {{ n.area }}
+{% endfor %}
+!
+{% endif %}
+end

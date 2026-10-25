@@ -1,0 +1,10 @@
+nornir>=3.4
+nornir-napalm>=0.5
+nornir-utils>=0.2
+napalm>=4.1
+jinja2>=3.1
+pyyaml>=6.0
+pytest>=8.0
+# AI assistant
+openai>=1.0
+instructor>=1.0
