@@ -3,7 +3,7 @@
 # The pipeline renders these values into real config and pushes them.
 
 core1:
-  hostname: 172.20.20.11
+  hostname: 172.100.100.11
   groups: [eos]
   data:
     role: core
@@ -30,7 +30,7 @@ core1:
         - { prefix: 10.0.20.0,  wildcard: 0.0.0.255, area: 0 }
 
 core2:
-  hostname: 172.20.20.12
+  hostname: 172.100.100.12
   groups: [eos]
   data:
     role: core
@@ -57,7 +57,7 @@ core2:
         - { prefix: 10.0.20.0,  wildcard: 0.0.0.255, area: 0 }
 
 acc1:
-  hostname: 172.20.20.21
+  hostname: 172.100.100.21
   groups: [eos]
   data:
     role: access
@@ -69,7 +69,7 @@ acc1:
       - { name: Ethernet2, desc: "uplink to core2", allowed: "10,20" }
 
 acc2:
-  hostname: 172.20.20.22
+  hostname: 172.100.100.22
   groups: [eos]
   data:
     role: access

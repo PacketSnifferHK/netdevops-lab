@@ -18,7 +18,7 @@ name: campus
 
 mgmt:
   network: campus_mgmt
-  ipv4-subnet: 172.20.20.0/24
+  ipv4-subnet: 172.100.100.0/24
 
 topology:
   kinds:
@@ -29,19 +29,19 @@ topology:
   nodes:
     core1:
       kind: arista_ceos
-      mgmt-ipv4: 172.20.20.11
+      mgmt-ipv4: 172.100.100.11
       startup-config: configs/core1.cfg
     core2:
       kind: arista_ceos
-      mgmt-ipv4: 172.20.20.12
+      mgmt-ipv4: 172.100.100.12
       startup-config: configs/core2.cfg
     acc1:
       kind: arista_ceos
-      mgmt-ipv4: 172.20.20.21
+      mgmt-ipv4: 172.100.100.21
       startup-config: configs/acc1.cfg
     acc2:
       kind: arista_ceos
-      mgmt-ipv4: 172.20.20.22
+      mgmt-ipv4: 172.100.100.22
       startup-config: configs/acc2.cfg
 
   links:
